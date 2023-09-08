@@ -84,16 +84,41 @@ def main():
             print(f"{i + 1}: {person1} and {person2} starred in {movie}")
 
 
-def shortest_path(source, target):
+def shortest_path(source_id, target_id):
     """
     Returns the shortest list of (movie_id, person_id) pairs
     that connect the source to the target.
 
     If no possible path, returns None.
     """
+    # Fetch ids of the source and target actors
 
-    # TODO
-    raise NotImplementedError
+    # Initialize a frontier
+    # Use BFS (Breadth First Search) to find the shortest path
+    frontier = QueueFrontier()
+    frontier.add(Node(state=source_id, parent=None, action=None))
+
+    # Keep track of people and movies that have already been explored
+    explored = set()
+
+    while True:
+        if frontier.empty():
+            raise Exception("No solution")
+        node = frontier.remove()
+
+        if node.state == target_id:
+            path = []
+            while node.parent is not None:
+                path.append((node.action, node.state))
+                node = node.parent
+            path.reverse()
+            return path
+        explored.add((node.action, node.state))
+
+        for action, state in neighbors_for_person(node.state):
+            if not frontier.contains_state(state) and (action, state) not in explored:
+                child = Node(state=state, parent=node, action=action)
+                frontier.add(child)
 
 
 def person_id_for_name(name):
